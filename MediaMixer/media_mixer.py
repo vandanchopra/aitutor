@@ -174,6 +174,13 @@ async def handler(websocket):
     print(f"Client connected: {websocket.remote_address}")
     mixer = MediaMixer()
     mixer.running = True
+    
+    # Check if we should enable camera and screen by default
+    # (when run through tutor script or with AUTO_ENABLE env var)
+    if os.environ.get('MEDIAMIXER_AUTO_ENABLE') == '1' or __name__ == '__main__':
+        mixer.show_camera = True
+        mixer.show_screen = True
+        print("✅ Camera and screen sharing enabled by default")
 
     async def send_frames():
         while mixer.running:
@@ -227,9 +234,85 @@ async def handler(websocket):
     await asyncio.gather(send_task, receive_task)
 
 async def main():
-    async with websockets.serve(handler, "localhost", 8765):
-        print("WebSocket server started on ws://localhost:8765")
-        await asyncio.Future()  # run forever
+    try:
+        print("Starting MediaMixer WebSocket server...")
+        async with websockets.serve(handler, "localhost", 8765):
+            print("✅ WebSocket server started on ws://localhost:8765")
+            await asyncio.Future()  # run forever
+    except Exception as e:
+        print(f"❌ Error starting MediaMixer: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    print("🚀 MediaMixer starting up...")
+    try:
+        # When running as main, enable camera and screen by default
+        original_handler = handler
+        async def main_handler(websocket):
+            print(f"Client connected: {websocket.remote_address}")
+            mixer = MediaMixer()
+            mixer.running = True
+            # Enable camera and screen by default when running as main
+            mixer.show_camera = True
+            mixer.show_screen = True
+            print("✅ Camera and screen sharing enabled by default")
+
+            async def send_frames():
+                while mixer.running:
+                    try:
+                        mixed_frame = mixer.mix_frames(scratchpad_current=mixer.scratchpad_frame)
+                        base64_frame = mixer.frame_to_base64(mixed_frame)
+                        await websocket.send(base64_frame)
+                        await asyncio.sleep(1/mixer.fps)
+                    except websockets.exceptions.ConnectionClosed:
+                        print("Client disconnected")
+                        mixer.running = False
+                        break
+                    except Exception as e:
+                        print(f"Error in send_frames: {e}")
+                        mixer.running = False
+                        break
+
+            async def receive_commands():
+                while mixer.running:
+                    try:
+                        message = await websocket.recv()
+                        try:
+                            # Assume message is a JSON string
+                            data = json.loads(message)
+                            if data.get('type') == 'scratchpad_frame':
+                                base64_data = data['data'].split(',')[1]
+                                img_bytes = base64.b64decode(base64_data)
+                                img = Image.open(io.BytesIO(img_bytes))
+                                # Convert RGB from browser to BGR for OpenCV
+                                mixer.scratchpad_frame = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                        except json.JSONDecodeError:
+                            # Message is not JSON, treat as a simple command
+                            if message == "start_camera":
+                                mixer.show_camera = True
+                            elif message == "stop_camera":
+                                mixer.show_camera = False
+                            elif message == "start_screen":
+                                mixer.show_screen = True
+                            elif message == "stop_screen":
+                                mixer.show_screen = False
+
+                    except websockets.exceptions.ConnectionClosed:
+                        mixer.running = False
+                        break
+                    except Exception as e:
+                        print(f"Error processing message: {e}")
+
+            send_task = asyncio.create_task(send_frames())
+            receive_task = asyncio.create_task(receive_commands())
+
+            await asyncio.gather(send_task, receive_task)
+        
+        # Override the handler for main execution
+        globals()['handler'] = main_handler
+        asyncio.run(main())
+    except Exception as e:
+        print(f"💥 Fatal error in MediaMixer: {e}")
+        import traceback
+        traceback.print_exc()

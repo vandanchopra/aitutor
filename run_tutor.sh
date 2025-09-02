@@ -22,15 +22,33 @@ trap cleanup INT
 
 # Start the Python backend in the background
 echo "Starting Python backend... Logs -> logs/mediamixer.log"
-(cd "$SCRIPT_DIR" && /Users/vandanchopra/Vandan_Personal_Folder/CODE_STUFF/Projects/venvs/aitutor/bin/python MediaMixer/media_mixer.py) > "$SCRIPT_DIR/logs/mediamixer.log" 2>&1 &
+echo "Working directory: $SCRIPT_DIR" >> "$SCRIPT_DIR/logs/mediamixer.log"
+echo "Python path: /Users/vandanchopra/Vandan_Personal_Folder/CODE_STUFF/Projects/venvs/aitutor/bin/python" >> "$SCRIPT_DIR/logs/mediamixer.log"
+(cd "$SCRIPT_DIR" && MEDIAMIXER_AUTO_ENABLE=1 /Users/vandanchopra/Vandan_Personal_Folder/CODE_STUFF/Projects/venvs/aitutor/bin/python MediaMixer/media_mixer.py) >> "$SCRIPT_DIR/logs/mediamixer.log" 2>&1 &
+MEDIAMIXER_PID=$!
 
 # Start the FastAPI server in the background
-echo "Starting DASH API server... Logs -> logs/api.log"
-(cd "$SCRIPT_DIR" && /Users/vandanchopra/Vandan_Personal_Folder/CODE_STUFF/Projects/venvs/aitutor/bin/python DashSystem/dash_api.py) > "$SCRIPT_DIR/logs/api.log" 2>&1 &
+echo "Starting DASH API server... Logs -> logs/dash_api.log"
+(cd "$SCRIPT_DIR" && /Users/vandanchopra/Vandan_Personal_Folder/CODE_STUFF/Projects/venvs/aitutor/bin/python DashSystem/dash_api.py) > "$SCRIPT_DIR/logs/dash_api.log" 2>&1 &
 
 # Give the backend servers a moment to start
 echo "Waiting for backend services to initialize..."
-sleep 2
+echo "MediaMixer PID: $MEDIAMIXER_PID"
+sleep 3
+echo "Checking if MediaMixer is still running..."
+if kill -0 $MEDIAMIXER_PID 2>/dev/null; then
+    echo "✅ MediaMixer is running (PID: $MEDIAMIXER_PID)"
+    # Check if it's listening on port 8765
+    if lsof -i :8765 >/dev/null 2>&1; then
+        echo "✅ MediaMixer is listening on port 8765"
+    else
+        echo "⚠️  MediaMixer process exists but not listening on port 8765"
+    fi
+else
+    echo "❌ MediaMixer process died"
+    echo "Last few lines of MediaMixer log:"
+    tail -5 "$SCRIPT_DIR/logs/mediamixer.log"
+fi
 
 # Start the Node.js frontend in the background
 echo "Starting Node.js frontend... Logs -> logs/frontend.log"

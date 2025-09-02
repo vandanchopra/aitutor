@@ -1,19 +1,19 @@
 {
   "user_id": "test_student",
-  "created_at": 1756591968.1632261,
-  "last_updated": 1756687638.757965,
+  "created_at": 1756848525.357194,
+  "last_updated": 1756848699.1283789,
   "skill_states": {
     "counting_1_10": {
-      "memory_strength": 1.0930217776663602,
-      "last_practice_time": 1756592344.8341382,
-      "practice_count": 3,
+      "memory_strength": 0.9438470945699234,
+      "last_practice_time": 1756848699.1274939,
+      "practice_count": 2,
       "correct_count": 2
     },
     "number_recognition": {
-      "memory_strength": 0.8333333333333334,
-      "last_practice_time": 1756687638.7561128,
-      "practice_count": 2,
-      "correct_count": 2
+      "memory_strength": 0.0,
+      "last_practice_time": null,
+      "practice_count": 0,
+      "correct_count": 0
     },
     "basic_shapes": {
       "memory_strength": 0.0,
@@ -192,17 +192,7 @@
       ],
       "is_correct": true,
       "response_time_seconds": 5.0,
-      "timestamp": 1756592328.728058,
-      "time_penalty_applied": false
-    },
-    {
-      "question_id": "k_count_mc_1",
-      "skill_ids": [
-        "counting_1_10"
-      ],
-      "is_correct": false,
-      "response_time_seconds": 5.0,
-      "timestamp": 1756592338.624513,
+      "timestamp": 1756848656.9820852,
       "time_penalty_applied": false
     },
     {
@@ -212,27 +202,7 @@
       ],
       "is_correct": true,
       "response_time_seconds": 5.0,
-      "timestamp": 1756592344.8351018,
-      "time_penalty_applied": false
-    },
-    {
-      "question_id": "k_num_fr_1",
-      "skill_ids": [
-        "number_recognition"
-      ],
-      "is_correct": true,
-      "response_time_seconds": 5.0,
-      "timestamp": 1756592352.6714098,
-      "time_penalty_applied": false
-    },
-    {
-      "question_id": "k_num_mc_1",
-      "skill_ids": [
-        "number_recognition"
-      ],
-      "is_correct": true,
-      "response_time_seconds": 5.0,
-      "timestamp": 1756687638.757962,
+      "timestamp": 1756848699.1283772,
       "time_penalty_applied": false
     }
   ],
