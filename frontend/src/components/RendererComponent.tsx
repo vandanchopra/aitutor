@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
-import { ServerItemRenderer } from "../package/perseus/src/server-item-renderer";
-import { storybookDependenciesV2 } from "../package/perseus/testing/test-dependencies";
+import { ServerItemRenderer } from "@khanacademy/perseus";
 import type { PerseusItem } from "@khanacademy/perseus-core";
 import { PerseusI18nProvider } from "../contexts/perseusI18nContext";
 import { ExamContext } from "../contexts/ExamContext";
-import { scorePerseusItem } from "@khanacademy/perseus-score";
-import { keScoreFromPerseusScore } from "../package/perseus/src/util/scoring"; 
+// import { scorePerseusItem, keScoreFromPerseusScore, } from "@khanacademy/perseus-score";
+// import { testDependenciesV2 } from "../perseus-init";
+import { storybookDependenciesV2 } from "../package/perseus/testing/test-dependencies";
 
 const RendererComponent = () => {
     const [perseusItems, setPerseusItems] = useState<PerseusItem[]>([]);
     const [item, setItem] = useState(0);
     const [loading, setLoading] = useState(true);
     const { dispatch } = React.useContext(ExamContext);
-    const rendererRef = useRef<ServerItemRenderer>(null);
+    // const rendererRef = useRef<ServerItemRenderer>(null);
 
     useEffect(() => {
         fetch("http://localhost:8001/api/questions")
@@ -27,31 +27,6 @@ const RendererComponent = () => {
                 setLoading(false);
             });
     }, []);
-
-    const handleSubmit = () => {
-        if (rendererRef.current) {
-            const userInput = rendererRef.current.getUserInput();
-            const question = perseusItem.question;
-            const score = scorePerseusItem(question, userInput, "en");
-            
-            // Continue to include an empty guess for the now defunct answer area.
-            const maxCompatGuess = [rendererRef.current.getUserInputLegacy(), []];
-            const keScore = keScoreFromPerseusScore(score, maxCompatGuess, rendererRef.current.getSerializedState().question);
-
-            // Record the answer 
-            dispatch({
-                type: 'RECORD_ANSWER',
-                payload: {
-                    questionId: `question-${item}`,
-                    answer: userInput
-                }
-            });
-
-            // Optionally, grade the exam if this is the last question
-            // For now, just log the score
-            console.log("Score:", keScore);
-        }
-    };
 
     const perseusItem = perseusItems[item] || {};
 
@@ -77,7 +52,7 @@ const RendererComponent = () => {
                 </button>
                 {!loading && perseusItems.length >= 1 &&
                     <ServerItemRenderer
-                        ref={rendererRef}
+                        // ref={rendererRef}
                         problemNum={0}
                         item={perseusItem}
                         dependencies={storybookDependenciesV2}
@@ -96,12 +71,6 @@ const RendererComponent = () => {
                         hintsVisible={0}
                         reviewMode={false}
                     />}
-                
-                {/* <button
-                    onClick={handleSubmit}
-                    className="absolute bg-blue-500 rounded text-white p-2 bottom-8 right-40">
-                    Submit
-                </button> */}
             </div>
         </PerseusI18nProvider>
     );

@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "dependencies": {
     "@google/genai": "^0.14.0",
+    "@khanacademy/keypad-context": "^3.2.7",
     "@khanacademy/math-input": "^26.2.4",
     "@khanacademy/perseus": "68.0.2",
+    "@khanacademy/perseus-core": "^19.2.0",
+    "@khanacademy/perseus-linter": "^4.3.7",
+    "@khanacademy/perseus-score": "^7.7.7",
+    "@khanacademy/perseus-utils": "^2.1.0",
     "@khanacademy/wonder-blocks-accordion": "^3.1.39",
     "@tailwindcss/vite": "^4.1.13",
     "classnames": "^2.5.1",
@@ -27,7 +32,7 @@
     "web-vitals": "^2.1.4",
     "zustand": "^5.0.1"
   },
-  "type":"module",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
