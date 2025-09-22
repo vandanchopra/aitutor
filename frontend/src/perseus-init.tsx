@@ -1,5 +1,14 @@
+import * as React from "react";
+import { registerAllWidgetsForTesting, Dependencies } from "@khanacademy/perseus";
 import { PerseusDependencies, PerseusDependenciesV2 } from "@khanacademy/perseus";
 import {TestMathjax} from "./test-mathjax";
+
+// We do nothing in this implementation, but it is easy to spy on the .Log of
+// the PerseusDependencies in tests and then assert on the calls.
+const LogForTesting = {
+    log: () => {},
+    error: () => {},
+};
 
 const testDependencies: PerseusDependencies = {
     // JIPT
@@ -105,8 +114,6 @@ export const DependenciesV2: PerseusDependenciesV2 = {
     // Override if necessary
 };
 
-import { } from "@khanacademy/perseus-core";
-import { } from "@khanacademy/perseus-utils";
 // Initialize Perseus
 registerAllWidgetsForTesting();
-setDependencies(TestDependencies);
+Dependencies.setDependencies(TestDependencies);
