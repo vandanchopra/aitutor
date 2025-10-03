@@ -1,10 +1,11 @@
 from math import e
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from app.agent.agent import execute
 import asyncio
 import json
 import uuid
-import pathlib 
+import pathlib  
 from typing import List
 from app.utils.khan_questions_loader import load_questions
 
@@ -39,7 +40,6 @@ async def generate_question(request: Request):
         file_name = str(uuid.uuid4())
         with open(f"{base_dir}/GenAIQuestions/{file_name}.json", "w") as f:
             json.dump(question_json, f, indent=4)
-            print("exicuted")
-        return {"message":"Question generated successfully"}
+        return JSONResponse(content={"messag":"Question generated successfully"}, status_code=201)
     except json.JSONDecodeError as e:
         return {"error": "Failed to parse JSON", "details": str(e), "response": response}

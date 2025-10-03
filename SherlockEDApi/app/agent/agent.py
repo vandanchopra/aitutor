@@ -8,22 +8,10 @@ import uuid
 import asyncio
 from dotenv import load_dotenv 
 from .prompt import prompt
-load_dotenv() # Load environment variables from a .env file if present
-
-
+ 
 USER_ID="sherlockED"
-
-
-# def process_widgets(widgets: dict):
-#     content = json_data.content
-#     for widget_key, widget in widgets.items():
-#         # --- Radio widget: add unique IDs to choices
-#         if widget.get("type") == "radio":
-#             choices = widget.get("options", {}).get("choices", [])
+load_dotenv()
         
-
-
-
 questions_generator_agent = Agent(
     name="questions_generator_agent",
     description="Agent that generates new perseus format questions",
@@ -64,7 +52,3 @@ async def execute(data: str) -> str:
     ):
         if ev.is_final_response() and ev.content and ev.content.parts:
             return ev.content.parts[0].text
-        
-# if __name__ == "__main__":
-#     response = asyncio.run(execute("Generate a new perseus question in json format"))
-#     print(f"LLM response: {response}")
